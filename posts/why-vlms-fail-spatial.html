@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Why VLMs Fail at Spatial Reasoning · Japjot Kaur Saggu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Lato', sans-serif; font-size: 15px; line-height: 1.7; color: #222; background: #fff; }
+    a { color: #1772d0; text-decoration: none; }
+    a:hover { text-decoration: underline; color: #f09228; }
+    .page { max-width: 680px; margin: 0 auto; padding: 44px 24px 80px; }
+    .back { font-size: 13px; margin-bottom: 32px; }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+    .meta { font-size: 13px; color: #999; margin-bottom: 32px; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; }
+    h2 { font-size: 17px; font-weight: 700; margin: 36px 0 12px; }
+    p { margin-bottom: 14px; color: #333; }
+    .ref-block { margin-top: 48px; border-top: 1px solid #e0e0e0; padding-top: 20px; }
+    .ref-block p { font-size: 13px; color: #666; }
+    footer { margin-top: 64px; border-top: 1px solid #eee; padding-top: 16px; font-size: 12px; color: #bbb; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="back"><a href="../index.html">← back</a></div>
+
+  <h1>Why Vision-Language Models Fail at Spatial Reasoning</h1>
+  <div class="meta">May 2025</div>
+
+  <p>Vision-language models have made remarkable strides in understanding images: identifying objects, generating captions, answering questions about visual content. Yet ask one whether the apple is to the left of the cup, and it will frequently get it wrong. Two recent papers shed light on why, and together they paint a coherent picture of a deep architectural blind spot.</p>
+
+  <h2>The Attention Imbalance</h2>
+
+  <p>The first clue comes from inside the model. Chen et al. (2025) find that despite image tokens making up around 90% of a typical input sequence, they receive only about 10% of the model's attention. Text dominates. This means that when a VLM processes a spatial query, it is largely reasoning from language priors rather than genuinely interrogating the image. The model knows what "left" and "right" mean in the abstract; it just is not looking hard enough at the picture to apply those concepts correctly.</p>
+
+  <p>This imbalance is not uniform. Chen et al. show that models perform markedly better on familiar spatial relationships like "on the left side of" than on less common ones like "in front of." When the phrasing is familiar, the model can lean on textual pattern-matching and sometimes get lucky. When it is not, the lack of genuine visual grounding is fully exposed.</p>
+
+  <h2>The Bag-of-Tokens Problem</h2>
+
+  <p>The second paper identifies a complementary, and arguably more fundamental, cause. Rahmanzadehgervi et al. (2025) find that vision embeddings inside VLMs are treated as a semantic "bag-of-tokens," analogous to the old bag-of-words representations in NLP, where word order was discarded entirely. Position is lost. The model knows what objects are present, but the structural information about where they sit relative to one another is washed out.</p>
+
+  <p>This is confirmed by a striking diagnostic: removing token order or fine-grained spatial details from the visual input produces almost no drop in performance (Rahmanzadehgervi et al., 2025). The model was not using that information in the first place. The culprit is the disproportionately large embedding norms of semantic features, which effectively drown out the subtler positional signals present in the representation.</p>
+
+  <h2>Two Pathways, One Failure</h2>
+
+  <p>Taken together, the two papers suggest VLMs have a strong ventral stream (the brain's object recognition pathway) but a weak or absent dorsal stream, which handles spatial and relational processing. Rahmanzadehgervi et al. draw explicitly on this dual-pathway model of human vision to frame their analysis. VLMs can see what is in an image with impressive accuracy. They struggle to reason about where things are.</p>
+
+  <p>The failure is not one of raw capability but of architectural priority. Semantic understanding has been heavily optimised for; spatial structure has been treated as an afterthought, if it has been considered at all.</p>
+
+  <h2>Fixes on the Horizon</h2>
+
+  <p>Both papers offer interventions. Chen et al. propose ADAPTVIS, a training-free decoding strategy that dynamically adjusts attention based on the model's confidence, sharpening focus on relevant image regions when the model is sure and broadening it when uncertain. This alone yields up to fifty percentage point improvements on spatial benchmarks with negligible computational overhead.</p>
+
+  <p>Rahmanzadehgervi et al. propose normalising vision embedding norms so that positional signals are no longer overwhelmed by semantic ones, and extracting features from intermediate layers where spatial structure is better preserved before being diluted in later processing.</p>
+
+  <p>Neither fix requires retraining from scratch. Both are lightweight and interpretability-informed, which is itself a signal that the problem is structural, not intractable.</p>
+
+  <h2>What This Means</h2>
+
+  <p>These findings matter beyond benchmark scores. Spatial reasoning is foundational to real-world deployment: robotics, navigation, medical imaging, scene understanding. A model that cannot reliably distinguish "above" from "below" is not ready for those tasks, however fluent its language output may be.</p>
+
+  <p>The good news is that the community now has a clearer diagnosis. The failure is not mysterious; it is a predictable consequence of how visual information is represented and attended to. That makes it solvable.</p>
+
+  <div class="ref-block">
+    <p>[1] Chen, S., et al. (2025). Why Is Spatial Reasoning Hard for VLMs? An Attention Mechanism Perspective on Focus Areas. arXiv:2503.01773.</p>
+    <p>[2] Rahmanzadehgervi, P., et al. (2025). Beyond Semantics: Rediscovering Spatial Awareness in Vision-Language Models. arXiv:2503.17349.</p>
+  </div>
+
+</div>
+<footer>
+  Template inspired by <a href="https://jonbarron.info/">Jon Barron</a> · Hosted on <a href="https://pages.github.com/">GitHub Pages</a>
+</footer>
+</body>
+</html>
