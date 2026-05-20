@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grounding VLMs in 3D · Japjot Kaur Saggu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Lato', sans-serif; font-size: 15px; line-height: 1.7; color: #222; background: #fff; }
+    a { color: #1772d0; text-decoration: none; }
+    a:hover { text-decoration: underline; color: #f09228; }
+    .page { max-width: 680px; margin: 0 auto; padding: 44px 24px 80px; }
+    .back { font-size: 13px; margin-bottom: 32px; }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+    .meta { font-size: 13px; color: #999; margin-bottom: 32px; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; }
+    h2 { font-size: 17px; font-weight: 700; margin: 36px 0 12px; }
+    h3 { font-size: 15px; font-weight: 700; margin: 24px 0 8px; }
+    p { margin-bottom: 14px; color: #333; }
+    .ref-block { margin-top: 48px; border-top: 1px solid #e0e0e0; padding-top: 20px; }
+    .ref-block p { font-size: 13px; color: #666; }
+    footer { margin-top: 64px; border-top: 1px solid #eee; padding-top: 16px; font-size: 12px; color: #bbb; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="back"><a href="../index.html">← back</a></div>
+
+  <h1>Grounding Vision-Language Models in 3D with G2VLM and VG-LLM</h1>
+  <div class="meta">May 2025</div>
+
+  <p>The spatial intelligence of vision-language models has long lagged behind their linguistic capabilities. While these models can describe images fluently and answer questions about visual scenes, they consistently struggle when tasks require genuine three-dimensional reasoning. Two recent papers tackle this problem head-on, each proposing a different route to the same destination: a model that truly understands space. G2VLM, accepted at CVPR 2026, and VG-LLM, presented at NeurIPS 2025, represent complementary and instructive approaches to closing the gap between 2D image understanding and 3D spatial intelligence.</p>
+
+  <h2>The Problem Both Papers Share</h2>
+
+  <p>Standard vision-language models are trained almost entirely on 2D image-text pairs. They learn to match words to pixels but have no explicit mechanism for reconstructing the geometry of a scene. The result is that even large, capable models perform poorly on tasks requiring spatial understanding: determining which object is closer, estimating distances, or reasoning about the arrangement of objects in a room.</p>
+
+  <p>Both papers identify the same root cause. Models lack a geometric learning process that can recover 3D structure from 2D inputs. Without such a process, spatial tokens are learned in an impoverished representational space, and no amount of scaling on 2D data appears to close the gap.</p>
+
+  <h2>G2VLM: A Unified Architecture for Geometry and Language</h2>
+
+  <p>Hu et al. (2025). G2VLM: Geometry Grounded Vision Language Model with Unified 3D Reconstruction and Spatial Reasoning. arXiv:2511.21688. CVPR 2026.</p>
+
+  <p>G2VLM approaches the problem by unifying 3D reconstruction and spatial language understanding within a single model. Rather than adding geometric features as a bolt-on, the authors redesign the architecture so that geometric reasoning and semantic reasoning are learned jointly and allowed to inform one another.</p>
+
+  <h3>Architecture</h3>
+
+  <p>The model adopts a Mixture-of-Transformer-Experts (MoT) design with two dedicated expert pathways. One is a geometric perception expert, which the authors call the "where pathway," responsible for visual geometry learning and tasks such as depth estimation, camera pose prediction, and point cloud reconstruction. The other is a semantic perception expert, the "what pathway," which handles multimodal language understanding and spatial reasoning. Critically, these two experts interact through shared self-attention, so geometric representations can directly improve language-level spatial reasoning and vice versa.</p>
+
+  <p>This design is directly motivated by the two-streams hypothesis in neuroscience, which posits that the primate visual cortex uses separate but interacting pathways for spatial and object processing.</p>
+
+  <h3>Training</h3>
+
+  <p>Training proceeds in two stages. In the first stage, the semantic expert is initialised from a pretrained VLM while the geometric expert is trained from scratch on large collections of multi-view images and videos. In the second stage, both experts are jointly fine-tuned. This allows the model to leverage the considerable semantic knowledge already encoded in existing VLMs while still building genuine geometric understanding.</p>
+
+  <p>A notable advantage of this design is scalability. Because multi-view images and videos are abundant and require no specialist annotation, the geometric expert can be trained on far more data than methods that depend on manually labelled 3D datasets.</p>
+
+  <h3>Results</h3>
+
+  <p>On spatial reasoning benchmarks, G2VLM achieves results that are better than or comparable to those of much larger models. On SPAR-Bench, it surpasses GPT-4o by 18.5 points. On 3D reconstruction tasks, it achieves results competitive with state-of-the-art feed-forward reconstruction models, making it the first model to perform strongly at both objectives simultaneously.</p>
+
+  <h2>VG-LLM: Injecting 3D Priors into a Video MLLM</h2>
+
+  <p>Zheng et al. (2025). Learning from Videos for 3D World: Enhancing MLLMs with 3D Vision Geometry Priors. arXiv:2505.24625. NeurIPS 2025.</p>
+
+  <p>VG-LLM takes a more modular approach. Rather than redesigning the model from scratch, the authors introduce a dedicated 3D visual geometry encoder alongside a conventional 2D visual encoder, fusing their outputs before passing features to the language model backbone. The key insight is that a geometry encoder pre-trained on tasks such as point map prediction already carries strong 3D priors, and that these priors can be grafted onto an existing MLLM with relatively modest additional training.</p>
+
+  <h3>Architecture</h3>
+
+  <p>Input video frames are processed by two parallel encoders. The 2D encoder, drawing on a standard visual backbone, extracts per-frame semantic features. The 3D visual geometry encoder, based on the Visual Geometry Grounded Transformer (VGGT), processes the full sequence and produces geometry-aware features that capture inter-frame correspondences and global scene structure. The outputs of both encoders are fused at the patch level and fed into the MLLM backbone, which is built on Qwen2.5-VL.</p>
+
+  <p>The geometry encoder is pre-trained on point map prediction across image pairs and sequences. This pre-training embeds strong spatial perception knowledge and makes the encoder robust to viewpoint changes, a property that transfers directly to downstream spatial reasoning.</p>
+
+  <h3>No 3D Input Required</h3>
+
+  <p>A defining characteristic of VG-LLM is that it requires only RGB video at both training and inference time. Previous work on 3D scene understanding with MLLMs typically depends on point clouds, depth sensors, or reconstructed bird's-eye view maps. VG-LLM sidesteps all of these, learning 3D structure implicitly from the geometry encoder rather than receiving it as explicit input.</p>
+
+  <p>All downstream tasks, including 3D visual grounding, 3D dense captioning, and 3D video object detection, are formulated as next-token prediction over text, with no task-specific heads. This keeps the training objective simple and the architecture general.</p>
+
+  <h3>Results</h3>
+
+  <p>The 4B parameter version of VG-LLM, without any explicit 3D data input, achieves competitive results on standard 3D scene understanding benchmarks and surpasses Gemini-1.5-Pro on VSI-Bench evaluations. The 8B model sets a new state-of-the-art on average accuracy across spatial reasoning benchmarks at 50.7%. On Scan2Cap, the model surpasses the previous state-of-the-art LEO by 1.7 CIDEr points despite using no 3D camera parameters or depth information during inference.</p>
+
+  <h2>Comparing the Two Approaches</h2>
+
+  <p>Both papers share the same core motivation, but they differ substantially in how they pursue it.</p>
+
+  <p>G2VLM integrates geometry as an equal partner within the model's representational structure. Its Mixture-of-Transformer-Experts design ensures that geometric and semantic representations are mutually reinforcing at every transformer block. This tight coupling yields strong performance on both reconstruction and reasoning tasks, but it requires designing and training a new unified architecture from scratch.</p>
+
+  <p>VG-LLM treats geometry as a rich prior to be imported into an existing system. By plugging a pre-trained geometry encoder into a strong MLLM backbone and fusing at the patch level, the authors achieve significant gains with a more modular intervention. This approach is arguably easier to apply to future MLLM backbones as they improve, since the geometry encoder and the language model can be updated somewhat independently.</p>
+
+  <p>The two papers also differ in their data regimes. G2VLM trains the geometric expert on abundant multi-view image and video data, emphasising scalability without hard-to-collect annotations. VG-LLM draws on a combination of video datasets, spatial reasoning data such as SPAR-7M, and 3D indoor scene datasets including ScanNet, ScanRefer, Scan2Cap, and EmbodiedScan.</p>
+
+  <p>Both models use Qwen2.5-VL as a backbone or point of comparison, and both build on VGGT-style geometry encoders, which reflects the influence of that single upstream model on the current generation of 3D-aware VLMs.</p>
+
+  <h2>Broader Significance</h2>
+
+  <p>These two papers are part of a broader shift in the VLM research community toward taking 3D structure seriously. The dominant paradigm of training on 2D image-text data has produced impressive results on many benchmarks but has revealed systematic weaknesses in tasks that require genuine scene understanding. Spatial reasoning, robotics, embodied AI, and 3D scene editing all depend on models that can recover and manipulate three-dimensional representations, not just describe flat images.</p>
+
+  <p>G2VLM and VG-LLM each offer a distinct blueprint for how to get there. G2VLM makes geometry a first-class citizen of the model architecture. VG-LLM makes it an enriched input signal. Together, they suggest that geometry-grounded VLMs are approaching a point where they can serve as practical foundation models for spatially intelligent applications, without requiring specialised 3D sensors or expensive annotated datasets.</p>
+
+  <div class="ref-block">
+    <p>[1] Hu, W., Lin, J., Long, Y., Ran, Y., Jiang, L., Wang, Y., Zhu, C., Xu, R., Wang, T., and Pang, J. (2025). G2VLM: Geometry Grounded Vision Language Model with Unified 3D Reconstruction and Spatial Reasoning. arXiv:2511.21688. CVPR 2026.</p>
+    <p>[2] Zheng, D., Huang, S., Li, Y., and Wang, L. (2025). Learning from Videos for 3D World: Enhancing MLLMs with 3D Vision Geometry Priors. arXiv:2505.24625. NeurIPS 2025.</p>
+    <p>[3] Wang, J., Chen, M., Karaev, N., Vedaldi, A., Rupprecht, C., and Novotny, D. (2025). VGGT: Visual Geometry Grounded Transformer. arXiv:2503.11651.</p>
+  </div>
+
+</div>
+<footer>
+  Template inspired by <a href="https://jonbarron.info/">Jon Barron</a> · Hosted on <a href="https://pages.github.com/">GitHub Pages</a>
+</footer>
+</body>
+</html>
