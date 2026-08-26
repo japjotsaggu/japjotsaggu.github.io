@@ -145,16 +145,6 @@
 
     .badge-dissertation { background: #f0e6ff; color: #5b21b6; }
 
-    /* BLOG placeholder */
-    .blog-placeholder {
-      padding: 32px 20px;
-      border: 1.5px dashed #ddd;
-      border-radius: 8px;
-      text-align: center;
-      color: #bbb;
-      font-size: 14px;
-    }
-
     footer {
       margin-top: 64px;
       border-top: 1px solid #eee;
@@ -194,12 +184,8 @@
       <p>
         I am a Master’s student in Artificial Intelligence at the Department of Computing, <a href="https://www.imperial.ac.uk/">Imperial College London</a>,
         currently working on my dissertation with Dr Rolandos Potamias.
-        My research interests lie in  <strong>multimodal large language models</strong>, 
-        <strong>spatial and 3D scene understanding</strong>, and <strong>embodied AI</strong>,
-        particularly how multimodal models reason about space, viewpoint, and time. I also enjoy 
-        building systems that make AI more practical and seamless in real world settings;
-        and I'm always on the lookout for cool problems to solve.
-      </p>
+        My research interests lie in  <strong>vision language models</strong>, <strong>3D vision</strong>
+        <strong>spatial understanding</strong>, and <strong>embodied AI</strong>.      </p>
       <p>
         Previously, I was a Machine Learning Engineer at
         <a href="https://www.wadhwaniai.org/">Wadhwani AI</a>, where I worked on
@@ -264,6 +250,27 @@
       </div>
     </div>
 
+    <!-- World Action Models for Robotic Manipulation -->
+    <div class="proj-item">
+      <div class="proj-thumb">
+        <img src="images/wam.png" alt="World action models for robotic manipulation teaser" />
+      </div>
+      <div class="proj-info">
+        <div class="proj-title">
+          World Action Models for Robotic Manipulation
+        </div>
+        <div class="proj-desc">
+          Exploring world models as action-conditioned latent state representations for robotic
+          manipulation. Compares 4D reconstruction and video-based scene representations as
+          learned dynamics priors, evaluating how well they capture the geometry and motion
+          needed to predict the consequences of an agent's actions in a manipulation setting.
+        </div>
+        <div class="proj-links">
+          <span class="coming">[code — coming soon]</span>
+        </div>
+      </div>
+    </div>
+
     <!-- More projects -->
     <div class="proj-item" style="padding-top: 10px; padding-bottom: 4px;">
       <div class="proj-thumb" style="visibility: hidden;"></div>
@@ -275,46 +282,6 @@
     </div>
 
   </div>
-
-  <!-- BLOG -->
-  <div class="section-heading" id="posts">Posts</div>
-  <div class="proj-list">
-
-  <div class="proj-item">
-    <div class="proj-info">
-      <div class="proj-title">
-        <a href="posts/grounding-vlms-3d.html">Grounding Vision-Language Models in 3D with G2VLM and VG-LLM</a>
-      </div>
-      <div class="proj-desc">
-        G2VLM (CVPR 2026) and VG-LLM (NeurIPS 2025) each offer a distinct blueprint for 3D-aware VLMs,
-        one makes geometry a first-class citizen of the architecture, the other imports it as a rich prior.
-      </div>
-      <div class="proj-links">
-        <span style="color:#aaa; font-size:12px;">May 2025</span>
-        <span class="lsep">|</span>
-        <a href="posts/grounding-vlms-3d.html">[read →]</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="proj-item">
-    <div class="proj-info">
-      <div class="proj-title">
-        <a href="posts/why-vlms-fail-spatial.html">Why Vision-Language Models Fail at Spatial Reasoning</a>
-      </div>
-      <div class="proj-desc">
-        VLMs have a strong ventral stream but a weak dorsal one. Two papers diagnose the 
-        attention imbalance and bag-of-tokens problem that cause spatial reasoning failures, and propose lightweight fixes.
-      </div>
-      <div class="proj-links">
-        <span style="color:#aaa; font-size:12px;">May 2025</span>
-        <span class="lsep">|</span>
-        <a href="posts/why-vlms-fail-spatial.html">[read →]</a>
-      </div>
-    </div>
-  </div>
-
-</div>
 
 </div>
 
